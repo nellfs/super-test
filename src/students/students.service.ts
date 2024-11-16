@@ -39,14 +39,27 @@ export class StudentsService {
   }
 
   async findOne(id: number): Promise<StudentDto> {
-    return (await this.studentModel.findOne({ where: { id } })) as StudentDto;
+    const student = await this.studentModel.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+    return student as StudentDto;
   }
 
   async update(
     id: number,
     updateStudentDto: UpdateStudentDto,
   ): Promise<StudentDto> {
-    await this.studentModel.update(updateStudentDto, { where: { id } });
+    const student = await this.studentModel.findOne({ where: { id } });
+    
+    console.log(!student)
+    if (!student) {
+      throw new NotFoundException('Student not found');
+    }
+
+    await this.studentModel.update(updateStudentDto, {
+      where: { id },
+    });
     return updateStudentDto as StudentDto;
   }
 
@@ -55,6 +68,6 @@ export class StudentsService {
     if (studentsAffected === 0) {
       throw new NotFoundException('Student not found');
     }
-    return {message:`Student removed`}
+    return { message: `Student removed` };
   }
 }

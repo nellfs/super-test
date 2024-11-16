@@ -29,6 +29,6 @@ import { Student } from './students/student.model';
     ClassesModule,
   ],
   controllers: [AppController],
-  providers: [AppService, StudentsService, ClassesService],
+  providers: [AppService],
 })
 export class AppModule {}
