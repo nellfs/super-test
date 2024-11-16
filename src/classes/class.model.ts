@@ -1,10 +1,12 @@
-import {
-  Column,
-  Model,
-  Table,
-} from 'sequelize-typescript';
+import { Column, Model, Table } from 'sequelize-typescript';
 
-@Table({ modelName: 'Classes', createdAt: 'created_at', updatedAt: 'updated_at' })
+@Table({
+  modelName: 'Classes',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  paranoid: true,
+  deletedAt: "deleted_at"
+})
 export class Class extends Model {
   @Column
   name: string;
