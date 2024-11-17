@@ -25,18 +25,18 @@ export class ClassesService {
   ) {}
 
   async create(createClassDto: CreateClassDto): Promise<ClassDto> {
-    const student = await this.classModel.findOne({
+    const existingClass = await this.classModel.findOne({
       where: { name: createClassDto.name },
     });
-    if (student) {
+    if (existingClass) {
       throw new BadRequestException(ERROR_MESSAGES.CLASS_ALREADY_EXISTS);
     }
 
-    const student_data = instanceToPlain(createClassDto);
+    const class_data = instanceToPlain(createClassDto);
 
-    const created_student = await this.classModel.create(student_data);
+    const created_class = await this.classModel.create(class_data);
 
-    return created_student as ClassDto;
+    return created_class as ClassDto;
   }
 
   async findAll(): Promise<ClassDto[]> {
@@ -44,17 +44,17 @@ export class ClassesService {
   }
 
   async findOne(id: number): Promise<ClassDto> {
-    const student = await this.classModel.findOne({ where: { id } });
-    if (!student) {
+    const existingClass = await this.classModel.findOne({ where: { id } });
+    if (!existingClass) {
       throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
     }
-    return student as ClassDto;
+    return existingClass as ClassDto;
   }
 
   async update(id: number, updateClassDto: UpdateClassDTO): Promise<ClassDto> {
-    const student = await this.classModel.findOne({ where: { id } });
+    const existingClass = await this.classModel.findOne({ where: { id } });
 
-    if (!student) {
+    if (!existingClass) {
       throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
     }
 
@@ -65,8 +65,8 @@ export class ClassesService {
   }
 
   async remove(id: number) {
-    const students_affected = await this.classModel.destroy({ where: { id } });
-    if (students_affected === 0) {
+    const classes_affected = await this.classModel.destroy({ where: { id } });
+    if (classes_affected === 0) {
       throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
     }
     return { message: SUCCESS_MESSAGES.CLASS_REMOVED };

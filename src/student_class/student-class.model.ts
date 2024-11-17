@@ -4,7 +4,7 @@ import { ClassModel } from 'src/classes/class.model';
 import { StudentModel } from 'src/students/student.model';
 
 @Table({
-  modelName: 'StudentClassEnrollments',
+  modelName: 'StudentClasses',
   timestamps: false,
 })
 export class StudentClassModel extends Model {

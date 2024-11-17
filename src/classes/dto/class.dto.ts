@@ -20,8 +20,7 @@ export class ClassDto {
 
   @IsDate()
   @Type(() => Date)
-  @IsNotEmpty()
-  end_date: Date;
+  end_date?: Date;
 }
 
 export class CreateClassDto extends OmitType(ClassDto, ['id'] as const) {}
