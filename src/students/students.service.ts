@@ -9,14 +9,20 @@ import {
   UpdateStudentDto,
 } from './dto/student.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Student } from './student.model';
+import { StudentModel } from './student.model';
 import { instanceToPlain } from 'class-transformer';
+import {
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+} from 'src/constants/messages.constants';
+import { ClassModel } from 'src/classes/class.model';
+import { ClassDto } from 'src/classes/dto/class.dto';
 
 @Injectable()
 export class StudentsService {
   constructor(
-    @InjectModel(Student)
-    private studentModel: typeof Student,
+    @InjectModel(StudentModel)
+    private studentModel: typeof StudentModel,
   ) {}
 
   async create(createStudentDTO: CreateStudentDto): Promise<StudentDto> {
@@ -24,14 +30,14 @@ export class StudentsService {
       where: { email: createStudentDTO.email },
     });
     if (student) {
-      throw new BadRequestException(`Student already exists`);
+      throw new BadRequestException(ERROR_MESSAGES.STUDENT_EMAIL_EXISTS);
     }
 
-    const studentData = instanceToPlain(createStudentDTO);
+    const student_data = instanceToPlain(createStudentDTO);
 
-    const createdStudent = await this.studentModel.create(studentData);
+    const created_student = await this.studentModel.create(student_data);
 
-    return createdStudent as StudentDto;
+    return created_student as StudentDto;
   }
 
   async findAll(): Promise<StudentDto[]> {
@@ -41,7 +47,7 @@ export class StudentsService {
   async findOne(id: number): Promise<StudentDto> {
     const student = await this.studentModel.findOne({ where: { id } });
     if (!student) {
-      throw new NotFoundException('Student not found');
+      throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
     }
     return student as StudentDto;
   }
@@ -51,10 +57,9 @@ export class StudentsService {
     updateStudentDto: UpdateStudentDto,
   ): Promise<StudentDto> {
     const student = await this.studentModel.findOne({ where: { id } });
-    
-    console.log(!student)
+
     if (!student) {
-      throw new NotFoundException('Student not found');
+      throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
     }
 
     await this.studentModel.update(updateStudentDto, {
@@ -64,10 +69,24 @@ export class StudentsService {
   }
 
   async remove(id: number) {
-    const studentsAffected = await this.studentModel.destroy({ where: { id } });
-    if (studentsAffected === 0) {
-      throw new NotFoundException('Student not found');
+    const students_affected = await this.studentModel.destroy({
+      where: { id },
+    });
+    if (students_affected === 0) {
+      throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
     }
-    return { message: `Student removed` };
+    return { message: SUCCESS_MESSAGES.STUDENT_REMOVED };
+  }
+
+  async listClasses(student_id: number): Promise<ClassDto[]> {
+    const student = await this.studentModel.findByPk(student_id, {
+      include: [ClassModel]
+    })
+
+    if (!student) {
+      throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
+    }
+
+    return student.classes as ClassDto[]
   }
 }

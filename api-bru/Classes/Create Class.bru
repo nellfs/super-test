@@ -1,0 +1,20 @@
+meta {
+  name: Create Class
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{api}}/students
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "first_name": "Teste12",
+    "last_name": "Sobrenome",
+    "email": "teste12@email.com",
+    "date_of_birth": "2024-10-10"
+  }
+}

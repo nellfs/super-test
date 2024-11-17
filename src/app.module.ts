@@ -7,8 +7,8 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { ConfigModule } from '@nestjs/config';
 import { StudentsModule } from './students/students.module';
 import { ClassesModule } from './classes/classes.module';
-import { Class } from './classes/class.model';
-import { Student } from './students/student.model';
+import { ClassModel } from './classes/class.model';
+import { StudentModel } from './students/student.model';
 
 @Module({
   imports: [
@@ -23,8 +23,6 @@ import { Student } from './students/student.model';
       autoLoadModels: true,
       synchronize: true,
     }), 
-    SequelizeModule.forFeature([Class]),
-    SequelizeModule.forFeature([Student]),
     StudentsModule,
     ClassesModule,
   ],

@@ -6,9 +6,11 @@ import {
   Patch,
   Param,
   Delete,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto, UpdateClassDTO } from './dto/class.dto';
+import { EnrollStudentsDto } from 'src/student_class/dto/student-class.dto';
 
 @Controller('classes')
 export class ClassesController {
@@ -25,17 +27,28 @@ export class ClassesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseIntPipe) id: string) {
     return this.classesService.findOne(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateClassDto: UpdateClassDTO) {
+  update(
+    @Param('id', ParseIntPipe) id: string,
+    @Body() updateClassDto: UpdateClassDTO,
+  ) {
     return this.classesService.update(+id, updateClassDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseIntPipe) id: string) {
     return this.classesService.remove(+id);
+  }
+
+  @Post(':id/enroll')
+  enroll(
+    @Param('id', ParseIntPipe) id: string,
+    @Body() students: EnrollStudentsDto,
+  ) {
+    return this.classesService.enrollStudents(students, +id);
   }
 }

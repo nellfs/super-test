@@ -14,6 +14,7 @@ import {
   StudentDto,
   UpdateStudentDto,
 } from './dto/student.dto';
+import { ClassDto } from 'src/classes/dto/class.dto';
 
 @Controller('students')
 export class StudentsController {
@@ -32,6 +33,11 @@ export class StudentsController {
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: string): Promise<StudentDto> {
     return this.studentsService.findOne(+id);
+  }
+
+  @Get(':id/classes')
+  listClasses(@Param('id', ParseIntPipe) id: number): Promise<ClassDto[]> {
+    return this.studentsService.listClasses(+id);
   }
 
   @Patch(':id')

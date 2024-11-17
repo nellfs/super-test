@@ -1,13 +1,15 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { BelongsToMany, Column, Model, Table } from 'sequelize-typescript';
+import { StudentClassModel } from 'src/student_class/student-class.model';
+import { StudentModel } from 'src/students/student.model';
 
 @Table({
   modelName: 'Classes',
   createdAt: 'created_at',
   updatedAt: 'updated_at',
   paranoid: true,
-  deletedAt: "deleted_at"
+  deletedAt: 'deleted_at',
 })
-export class Class extends Model {
+export class ClassModel extends Model {
   @Column
   name: string;
 
@@ -19,4 +21,7 @@ export class Class extends Model {
 
   @Column
   end_date: Date;
+
+  @BelongsToMany(() => StudentModel, () => StudentClassModel)
+  students: StudentModel[];
 }

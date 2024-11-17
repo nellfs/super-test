@@ -1,0 +1,17 @@
+meta {
+  name: Enroll Student
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{api}}/classes/1/enroll
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+   "students": [16, 17, 18]
+  }
+}

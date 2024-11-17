@@ -1,32 +1,88 @@
-import { Injectable } from '@nestjs/common';
-import { CreateClassDto, UpdateClassDTO } from './dto/class.dto';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
+import { ClassDto, CreateClassDto, UpdateClassDTO } from './dto/class.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Class } from './class.model';
+import { ClassModel } from './class.model';
+import { instanceToPlain } from 'class-transformer';
+import { StudentClassModel } from 'src/student_class/student-class.model';
+import { EnrollStudentsDto } from 'src/student_class/dto/student-class.dto';
+import {
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES,
+} from 'src/constants/messages.constants';
 
 @Injectable()
 export class ClassesService {
   constructor(
-    @InjectModel(Class)
-    private userModel: typeof Class,
+    @InjectModel(ClassModel)
+    private classModel: typeof ClassModel,
+
+    @InjectModel(StudentClassModel)
+    private enrollmentModel: typeof StudentClassModel,
   ) {}
 
-  async create(createClassDto: CreateClassDto) {
-    return 'next';
+  async create(createClassDto: CreateClassDto): Promise<ClassDto> {
+    const student = await this.classModel.findOne({
+      where: { name: createClassDto.name },
+    });
+    if (student) {
+      throw new BadRequestException(ERROR_MESSAGES.CLASS_ALREADY_EXISTS);
+    }
+
+    const student_data = instanceToPlain(createClassDto);
+
+    const created_student = await this.classModel.create(student_data);
+
+    return created_student as ClassDto;
   }
 
-  async findAll(): Promise<Class[]> {
-    return this.userModel.findAll();
+  async findAll(): Promise<ClassDto[]> {
+    return (await this.classModel.findAll()) as ClassDto[];
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} class`;
+  async findOne(id: number): Promise<ClassDto> {
+    const student = await this.classModel.findOne({ where: { id } });
+    if (!student) {
+      throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
+    }
+    return student as ClassDto;
   }
 
-  update(id: number, updateClassDto: UpdateClassDTO) {
-    return `This action updates a #${id} class`;
+  async update(id: number, updateClassDto: UpdateClassDTO): Promise<ClassDto> {
+    const student = await this.classModel.findOne({ where: { id } });
+
+    if (!student) {
+      throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
+    }
+
+    await this.classModel.update(updateClassDto, {
+      where: { id },
+    });
+    return updateClassDto as ClassDto;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} class`;
+  async remove(id: number) {
+    const students_affected = await this.classModel.destroy({ where: { id } });
+    if (students_affected === 0) {
+      throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
+    }
+    return { message: SUCCESS_MESSAGES.CLASS_REMOVED };
+  }
+
+  // TODO: go back here later
+  async enrollStudents(enroll_students: EnrollStudentsDto, class_id: number) {
+    const enrollments = enroll_students.students.map((student_id) => ({
+      student_id,
+      class_id,
+    }));
+
+    await this.enrollmentModel.bulkCreate(enrollments, {
+      ignoreDuplicates: true,
+    });
+
+    return { message: 'Students enrolled' };
   }
 }
