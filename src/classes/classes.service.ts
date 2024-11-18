@@ -7,12 +7,12 @@ import { ClassDto, CreateClassDto, UpdateClassDTO } from './dto/class.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { ClassModel } from './class.model';
 import { instanceToPlain } from 'class-transformer';
-import { StudentClassModel } from 'src/student_class/student-class.model';
+import { StudentClassModel } from '../student_class/student-class.model';
 import { EnrollStudentsDto } from 'src/student_class/dto/student-class.dto';
 import {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
-} from 'src/constants/messages.constants';
+} from '../constants/messages.constants';
 
 @Injectable()
 export class ClassesService {
@@ -28,6 +28,7 @@ export class ClassesService {
     const existingClass = await this.classModel.findOne({
       where: { name: createClassDto.name },
     });
+
     if (existingClass) {
       throw new BadRequestException(ERROR_MESSAGES.CLASS_ALREADY_EXISTS);
     }

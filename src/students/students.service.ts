@@ -14,8 +14,8 @@ import { instanceToPlain } from 'class-transformer';
 import {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
-} from 'src/constants/messages.constants';
-import { ClassModel } from 'src/classes/class.model';
+} from '../constants/messages.constants';
+import { ClassModel } from '../classes/class.model';
 import { ClassDto } from 'src/classes/dto/class.dto';
 
 @Injectable()

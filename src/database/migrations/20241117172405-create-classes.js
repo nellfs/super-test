@@ -10,19 +10,26 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       name: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      description: {
+      description: {        
+        allowNull: false,
         type: Sequelize.STRING,
       },
-      email: {
-        type: Sequelize.STRING,
-      },
-      createdAt: {
+      start_date: {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      updatedAt: {
+      end_date: {
+        allowNull: true,
+        type: Sequelize.DATE,
+      },
+      created_at: {
+        allowNull: false,
+        type: Sequelize.DATE,
+      },
+      updated_at: {
         allowNull: false,
         type: Sequelize.DATE,
       },

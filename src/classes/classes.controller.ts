@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
 import { CreateClassDto, UpdateClassDTO } from './dto/class.dto';
-import { EnrollStudentsDto } from 'src/student_class/dto/student-class.dto';
+import { EnrollStudentsDto } from '../student_class/dto/student-class.dto';
 
 @Controller('classes')
 export class ClassesController {

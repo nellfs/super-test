@@ -40,8 +40,21 @@ describe('ClassesService', () => {
           provide: getModelToken(ClassModel),
           useValue: {
             findAll: jest.fn().mockResolvedValue(class_list),
-            findOne: jest.fn().mockResolvedValue(class_list[0]),
-            create: jest.fn(),
+            findOne: jest.fn().mockImplementation((query) => {
+              if (query.where.id) {
+                return Promise.resolve(class_list[0]);
+              }
+              if (query.where.name === 'Future Class') {
+                return Promise.resolve(null);
+              }
+              return Promise.resolve(class_list[0]);
+            }),
+            create: jest.fn().mockImplementation((data) => {
+              return Promise.resolve({
+                id: 4,
+                ...data,
+              });
+            }),
           },
         },
         {
@@ -85,23 +98,21 @@ describe('ClassesService', () => {
         name: 'Future Class',
         description: 'To be defined',
         start_date: new Date('2024-11-17'),
-        end_date: null,
+        end_date: new Date('2024-11-17'),
       };
-
-      const newClass = {
-        id: 5,
-        name: 'Future Class',
-        description: 'To be defined',
-        start_date: new Date('2024-11-17'),
-        end_date: null,
-      };
-
-      classModel.create = jest.fn().mockResolvedValue(newClass);
 
       const result = await service.create(data);
 
-      expect(result).toEqual(newClass);
+      expect(classModel.findOne).toHaveBeenCalledWith({
+        where: { name: data.name },
+      });
+
       expect(classModel.create).toHaveBeenCalledWith(data);
+
+      expect(result).toEqual({
+        id: 4,
+        ...data,
+      });
     });
   });
 });

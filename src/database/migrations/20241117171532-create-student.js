@@ -10,12 +10,15 @@ module.exports = {
         type: Sequelize.INTEGER,
       },
       first_name: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       last_name: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       email: {
+        allowNull: false,
         type: Sequelize.STRING,
       },
       date_of_birth: {
@@ -25,6 +28,7 @@ module.exports = {
       created_at: {
         allowNull: false,
         type: Sequelize.DATE,
+        defaultValue: Sequelize.NOW
       },
       updated_at: {
         allowNull: false,
@@ -33,6 +37,7 @@ module.exports = {
       deleted_at: {
         allowNull: true,
         type: Sequelize.DATE,
+        defaultValue: null
       },
     });
   },

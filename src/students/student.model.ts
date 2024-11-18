@@ -4,8 +4,8 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript';
-import { ClassModel } from 'src/classes/class.model';
-import { StudentClassModel } from 'src/student_class/student-class.model';
+import { ClassModel } from '../classes/class.model';
+import { StudentClassModel } from '../student_class/student-class.model';
 
 @Table({
   modelName: 'Students',

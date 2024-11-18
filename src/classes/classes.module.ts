@@ -3,7 +3,7 @@ import { ClassesService } from './classes.service';
 import { ClassesController } from './classes.controller';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ClassModel } from './class.model';
-import { StudentClassModel } from 'src/student_class/student-class.model';
+import { StudentClassModel } from '../student_class/student-class.model';
 
 @Module({
   imports: [

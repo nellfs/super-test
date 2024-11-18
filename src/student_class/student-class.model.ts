@@ -1,7 +1,7 @@
 import { Model, PrimaryKey } from 'sequelize-typescript';
 import { Column, ForeignKey, Table } from 'sequelize-typescript';
-import { ClassModel } from 'src/classes/class.model';
-import { StudentModel } from 'src/students/student.model';
+import { ClassModel } from '../classes/class.model';
+import { StudentModel } from '../students/student.model';
 
 @Table({
   modelName: 'StudentClasses',

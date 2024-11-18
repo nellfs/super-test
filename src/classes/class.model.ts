@@ -1,6 +1,6 @@
 import { BelongsToMany, Column, Model, Table } from 'sequelize-typescript';
-import { StudentClassModel } from 'src/student_class/student-class.model';
-import { StudentModel } from 'src/students/student.model';
+import { StudentClassModel } from '../student_class/student-class.model';
+import { StudentModel } from '../students/student.model';
 
 @Table({
   modelName: 'Classes',

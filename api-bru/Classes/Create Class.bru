@@ -5,16 +5,17 @@ meta {
 }
 
 post {
-  url: {{api}}/students
+  url: {{api}}/classes
   body: json
   auth: none
 }
 
 body:json {
   {
-    "first_name": "Teste12",
-    "last_name": "Sobrenome",
-    "email": "teste12@email.com",
-    "date_of_birth": "2024-10-10"
+    "id": "32",
+    "name": "Class 3",
+    "description": "Welcome to the class 2",
+    "start_date": "2020-10-10",
+    "end_date": "2025-10-10"
   }
 }
