@@ -56,11 +56,7 @@ export class StudentsService {
     id: number,
     updateStudentDto: UpdateStudentDto,
   ): Promise<StudentDto> {
-    const student = await this.studentModel.findOne({ where: { id } });
-
-    if (!student) {
-      throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
-    }
+    await this.findOne(id);
 
     await this.studentModel.update(updateStudentDto, {
       where: { id },
@@ -80,13 +76,13 @@ export class StudentsService {
 
   async listClasses(student_id: number): Promise<ClassDto[]> {
     const student = await this.studentModel.findByPk(student_id, {
-      include: [ClassModel]
-    })
+      include: [ClassModel],
+    });
 
     if (!student) {
       throw new NotFoundException(ERROR_MESSAGES.STUDENT_NOT_FOUND);
     }
 
-    return student.classes as ClassDto[]
+    return student.classes as ClassDto[];
   }
 }

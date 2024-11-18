@@ -53,11 +53,7 @@ export class ClassesService {
   }
 
   async update(id: number, updateClassDto: UpdateClassDTO): Promise<ClassDto> {
-    const existingClass = await this.findOne(id);
-
-    if (!existingClass) {
-      throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
-    }
+    await this.findOne(id);
 
     await this.classModel.update(updateClassDto, {
       where: { id },
@@ -83,6 +79,6 @@ export class ClassesService {
       ignoreDuplicates: true,
     });
 
-    return { message: 'Students enrolled' };
+    return { message: SUCCESS_MESSAGES.STUDENTS_ENROLLED };
   }
 }
