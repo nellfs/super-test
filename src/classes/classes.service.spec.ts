@@ -3,7 +3,7 @@ import { ClassesService } from './classes.service';
 import { getModelToken } from '@nestjs/sequelize';
 import { ClassModel } from './class.model';
 import { StudentClassModel } from 'src/student_class/student-class.model';
-import { ClassDto, CreateClassDto, UpdateClassDTO } from './dto/class.dto';
+import { ClassDto, CreateClassDto } from './dto/class.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import {
   ERROR_MESSAGES,

@@ -7,6 +7,7 @@ import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { AppModule } from '../src/app.module';
 import { Sequelize } from 'sequelize-typescript';
+import { setupTestDatabase } from '../src/utils/setup_database';
 
 describe('AppController (integration-test)', () => {
   let app: INestApplication;
@@ -16,13 +17,14 @@ describe('AppController (integration-test)', () => {
   beforeAll(async () => {
     container = await new MySqlContainer().start();
 
+    // oi!! this is silly, container configuration can not be set in nest configuration
+    // so I am overwriting the enviroment by in integration tests
+
     process.env.MYSQL_HOST = container.getHost();
     process.env.MYSQL_PORT = container.getPort().toString();
     process.env.MYSQL_USERNAME = container.getUsername();
     process.env.MYSQL_PASSWORD = container.getUserPassword();
     process.env.MYSQL_DATABASE = container.getDatabase();
-
-    console.log(process.env.MYSQL_HOST, process.env.MYSQL_DATABASE, process.env.MYSQL_PASSWORD)
 
     sequelize = new Sequelize(
       container.getDatabase(),
@@ -37,7 +39,7 @@ describe('AppController (integration-test)', () => {
 
     try {
       await sequelize.authenticate();
-      console.log('Connection has been established successfully.');
+      await setupTestDatabase(sequelize);
     } catch (error) {
       console.error('Unable to connect to the database:', error);
     }
@@ -55,6 +57,10 @@ describe('AppController (integration-test)', () => {
 
     app = moduleFixture.createNestApplication();
     await app.init();
+  });
+
+  afterEach(async () => {
+    await app.close();
   });
 
   it('/ (GET)', () => {
