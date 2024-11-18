@@ -31,9 +31,9 @@ describe('ClassesController', () => {
     expect(controller).toBeDefined();
   });
 
-  // describe('findAll', () => {
-  //   it('should return an array of classes', async () => {
-  //     expect(controller.findAll).toBeDefined();
-  //   });
-  // });
+  describe('findAll', () => {
+    it('should return an array of classes', async () => {
+      expect(controller.findAll).toBeDefined();
+    });
+  });
 });

@@ -53,7 +53,7 @@ export class ClassesService {
   }
 
   async update(id: number, updateClassDto: UpdateClassDTO): Promise<ClassDto> {
-    const existingClass = await this.classModel.findOne({ where: { id } });
+    const existingClass = await this.findOne(id);
 
     if (!existingClass) {
       throw new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND);
@@ -73,7 +73,6 @@ export class ClassesService {
     return { message: SUCCESS_MESSAGES.CLASS_REMOVED };
   }
 
-  // TODO: go back here later
   async enrollStudents(enroll_students: EnrollStudentsDto, class_id: number) {
     const enrollments = enroll_students.students.map((student_id) => ({
       student_id,
