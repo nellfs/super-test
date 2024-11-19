@@ -1,12 +1,6 @@
 import { execSync } from 'child_process';
 import { Sequelize } from 'sequelize-typescript';
-import { StudentDto } from '../students/dto/student.dto';
-import { ClassDto, CreateClassDto } from '../classes/dto/class.dto';
-
-interface ITemplateDatabase {
-  students: StudentDto[];
-  classes: ClassDto[];
-}
+import { CreateClassDto } from '../classes/dto/class.dto';
 
 const now = new Date();
 

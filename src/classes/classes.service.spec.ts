@@ -3,39 +3,40 @@ import { ClassesService } from './classes.service';
 import { getModelToken } from '@nestjs/sequelize';
 import { ClassModel } from './class.model';
 import { StudentClassModel } from 'src/student_class/student-class.model';
-import { ClassDto, CreateClassDto } from './dto/class.dto';
+import { ClassDto, CreateClassDto, UpdateClassDTO } from './dto/class.dto';
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
 } from 'src/constants/messages.constants';
 
-export const class_list: ClassDto[] = [
-  {
-    id: 1,
-    name: 'Javascript & Typescript Basics',
-    description: 'Learn JS and TS',
-    start_date: new Date('2024-01-10'),
-    end_date: new Date('2024-04-10'),
-  },
-  {
-    id: 2,
-    name: 'Sequelize ORM',
-    description: 'How to setup Sequelize',
-    start_date: new Date('2024-02-15'),
-    end_date: null,
-  },
-  {
-    id: 3,
-    name: 'SQL and MySQL',
-    description: 'Learn SQL and use it with MySQL',
-    start_date: new Date('2024-03-01'),
-    end_date: new Date('2024-07-01'),
-  },
-];
 describe('ClassesService', () => {
   let service: ClassesService;
   let classModel: typeof ClassModel;
+
+  const class_list: ClassDto[] = [
+    {
+      id: 1,
+      name: 'Javascript & Typescript Basics',
+      description: 'Learn JS and TS',
+      start_date: new Date('2024-01-10'),
+      end_date: new Date('2024-04-10'),
+    },
+    {
+      id: 2,
+      name: 'Sequelize ORM',
+      description: 'How to setup Sequelize',
+      start_date: new Date('2024-02-15'),
+      end_date: null,
+    },
+    {
+      id: 3,
+      name: 'SQL and MySQL',
+      description: 'Learn SQL and use it with MySQL',
+      start_date: new Date('2024-03-01'),
+      end_date: new Date('2024-07-01'),
+    },
+  ];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -71,7 +72,10 @@ describe('ClassesService', () => {
         },
         {
           provide: getModelToken(StudentClassModel),
-          useValue: { findAll: jest.fn() },
+          useValue: {
+            findAll: jest.fn(),
+            bulkCreate: jest.fn().mockResolvedValue([]),
+          },
         },
       ],
     }).compile();
@@ -144,27 +148,27 @@ describe('ClassesService', () => {
   });
 
   describe('update', () => {
-    const updateDto = {
+    const updated_class: UpdateClassDTO = {
       name: 'Updated Class',
       description: 'Updated Description',
     };
 
     it('should update an existing class', async () => {
-      const result = await service.update(1, updateDto);
+      const result = await service.update(1, updated_class);
 
       expect(classModel.findOne).toHaveBeenCalledWith({
         where: { id: 1 },
       });
-      expect(classModel.update).toHaveBeenCalledWith(updateDto, {
+      expect(classModel.update).toHaveBeenCalledWith(updated_class, {
         where: { id: 1 },
       });
-      expect(result).toEqual(updateDto);
+      expect(result).toEqual(updated_class);
     });
 
     it('should throw not found expection when updating non existent class', async () => {
       jest.spyOn(classModel, 'findOne').mockResolvedValueOnce(null);
 
-      await expect(service.update(999, updateDto)).rejects.toThrow(
+      await expect(service.update(999, updated_class)).rejects.toThrow(
         new NotFoundException(ERROR_MESSAGES.CLASS_NOT_FOUND),
       );
 
@@ -177,7 +181,7 @@ describe('ClassesService', () => {
 
   describe('remove', () => {
     it('should successfully remove an existing class', async () => {
-      -jest.spyOn(classModel, 'destroy').mockResolvedValueOnce(1);
+      jest.spyOn(classModel, 'destroy').mockResolvedValueOnce(1);
 
       const result = await service.remove(1);
 
@@ -197,6 +201,24 @@ describe('ClassesService', () => {
       expect(classModel.destroy).toHaveBeenCalledWith({
         where: { id: 999 },
       });
+    });
+  });
+
+  describe('enrollStudents', () => {
+    const mockEnrollData = {
+      students: [1, 2, 3],
+    };
+    const class_id = 1;
+
+    it('should enroll students in an existing class', async () => {
+      mockEnrollData.students.map((student_id) => ({
+        student_id,
+        class_id,
+      }));
+
+      const result = await service.enrollStudents(mockEnrollData, class_id);
+
+      expect(result).toEqual({ message: SUCCESS_MESSAGES.STUDENTS_ENROLLED });
     });
   });
 });

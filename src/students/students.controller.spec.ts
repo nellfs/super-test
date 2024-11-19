@@ -10,11 +10,13 @@ describe('StudentsController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [StudentsController],
-      providers: [StudentsService,         {
-        provide: getModelToken(StudentModel),
-        useValue: { findOne: jest.fn() },
-      },],
-      
+      providers: [
+        StudentsService,
+        {
+          provide: getModelToken(StudentModel),
+          useValue: { findOne: jest.fn() },
+        },
+      ],
     }).compile();
 
     controller = module.get<StudentsController>(StudentsController);

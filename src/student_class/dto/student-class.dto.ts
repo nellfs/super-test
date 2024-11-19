@@ -1,4 +1,11 @@
-import { ArrayNotEmpty, ArrayUnique, IsArray, IsInt, IsNotEmpty, IsNumber } from 'class-validator';
+import {
+  ArrayNotEmpty,
+  ArrayUnique,
+  IsArray,
+  IsInt,
+  IsNotEmpty,
+  IsNumber,
+} from 'class-validator';
 
 export class EnrollmentDto {
   @IsNotEmpty()

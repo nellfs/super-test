@@ -10,5 +10,5 @@ export const SUCCESS_MESSAGES = {
   CLASS_REMOVED: 'Class removed',
 
   STUDENT_REMOVED: 'Student removed',
-  STUDENTS_ENROLLED: 'Students enrolled'
+  STUDENTS_ENROLLED: 'Students enrolled',
 };
