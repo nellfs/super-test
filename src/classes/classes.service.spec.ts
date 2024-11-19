@@ -9,6 +9,7 @@ import {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
 } from 'src/constants/messages.constants';
+import { Op } from 'sequelize';
 
 describe('ClassesService', () => {
   let service: ClassesService;
@@ -45,7 +46,7 @@ describe('ClassesService', () => {
         {
           provide: getModelToken(ClassModel),
           useValue: {
-            findAll: jest.fn().mockResolvedValue(class_list),
+            findAndCountAll: jest.fn().mockResolvedValue(class_list),
             findOne: jest.fn().mockImplementation((query) => {
               if (query.where.id) {
                 return Promise.resolve(class_list[0]);
@@ -90,14 +91,108 @@ describe('ClassesService', () => {
   });
 
   describe('findAll', () => {
-    it('should return a list with all classes', async () => {
-      const list = await service.findAll();
-
-      expect(list).toEqual(class_list);
-
-      expect(classModel.findAll).toHaveBeenCalledTimes(1);
+    it('should return paginated results without filters', async () => {
+      const mockResponse = {
+        count: class_list.length,
+        rows: class_list.slice(0, 2)
+      };
+      jest.spyOn(classModel, 'findAndCountAll').mockResolvedValueOnce(mockResponse as any);
+  
+      const result = await service.findAll({ page: 1, limit: 2 }, {});
+  
+      expect(result).toEqual({
+        items: class_list.slice(0, 2),
+        limit: 2,
+        total: class_list.length,
+        page: 1
+      });
+      expect(classModel.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 0,
+        where: {}
+      });
     });
-  });
+  
+    it('should apply name filter', async () => {
+      const mockResponse = {
+        count: 1,
+        rows: [class_list[0]]
+      };
+      jest.spyOn(classModel, 'findAndCountAll').mockResolvedValueOnce(mockResponse as any);
+  
+      const result = await service.findAll(
+        { page: 1, limit: 2 },
+        { name: 'Javascript' }
+      );
+  
+      expect(result).toEqual({
+        items: [class_list[0]],
+        limit: 2,
+        total: 1,
+        page: 1
+      });
+      expect(classModel.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 0,
+        where: {
+          name: {
+            [Op.startsWith]: 'Javascript'
+          }
+        }
+      });
+    });
+  
+    it('should apply description filter', async () => {
+      const mockResponse = {
+        count: 1,
+        rows: [class_list[1]]
+      };
+      jest.spyOn(classModel, 'findAndCountAll').mockResolvedValueOnce(mockResponse as any);
+  
+      const result = await service.findAll(
+        { page: 1, limit: 2 },
+        { description: 'How to' }
+      );
+  
+      expect(result).toEqual({
+        items: [class_list[1]],
+        limit: 2,
+        total: 1,
+        page: 1
+      });
+      expect(classModel.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 0,
+        where: {
+          description: {
+            [Op.startsWith]: 'How to'
+          }
+        }
+      });
+    });
+  
+    it('should handle pagination offset correctly', async () => {
+      const mockResponse = {
+        count: class_list.length,
+        rows: class_list.slice(2, 3)
+      };
+      jest.spyOn(classModel, 'findAndCountAll').mockResolvedValueOnce(mockResponse as any);
+  
+      const result = await service.findAll({ page: 2, limit: 2 }, {});
+  
+      expect(result).toEqual({
+        items: class_list.slice(2, 3),
+        limit: 2,
+        total: class_list.length,
+        page: 2
+      });
+      expect(classModel.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 2,
+        where: {}
+      });
+    });
+  })
 
   describe('findOne', () => {
     it('should return just a class', async () => {

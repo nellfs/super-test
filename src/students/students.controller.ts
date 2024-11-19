@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import {
@@ -15,6 +16,8 @@ import {
   UpdateStudentDto,
 } from './dto/student.dto';
 import { ClassDto } from 'src/classes/dto/class.dto';
+import { Pagination } from '../utils/pagination.dto';
+import { StudentFilter } from './dto/filter.dto';
 
 @Controller('students')
 export class StudentsController {
@@ -26,8 +29,11 @@ export class StudentsController {
   }
 
   @Get()
-  findAll(): Promise<StudentDto[]> {
-    return this.studentsService.findAll();
+  findAll(
+    @Query() paginationDto: Pagination,
+    @Query() filterDto: StudentFilter,
+  ) {
+    return this.studentsService.findAll(paginationDto, filterDto);
   }
 
   @Get(':id')

@@ -13,6 +13,9 @@ import {
   ERROR_MESSAGES,
   SUCCESS_MESSAGES,
 } from '../constants/messages.constants';
+import { Op } from 'sequelize';
+import { Pagination, PaginationResponse } from 'src/utils/pagination.dto';
+import { ClassFilter } from './dto/filter.dto';
 
 @Injectable()
 export class ClassesService {
@@ -40,8 +43,39 @@ export class ClassesService {
     return created_class as ClassDto;
   }
 
-  async findAll(): Promise<ClassDto[]> {
-    return (await this.classModel.findAll()) as ClassDto[];
+  async findAll(
+    pagination_options: Pagination,
+    filter: ClassFilter,
+  ): Promise<PaginationResponse<ClassDto>> {
+    const { page = 1, limit = 2 } = pagination_options;
+    const offset = (page - 1) * limit;
+
+    const where_filter: any = {};
+
+    if (filter.name) {
+      where_filter.name = {
+        [Op.startsWith]: filter.name,
+      };
+    }
+
+    if (filter.description) {
+      where_filter.description = {
+        [Op.startsWith]: filter.description,
+      };
+    }
+
+    const { count, rows } = await this.classModel.findAndCountAll({
+      limit: +limit,
+      offset,
+      where: where_filter,
+    });
+
+    return {
+      items: rows as ClassDto[],
+      limit,
+      total: count,
+      page: page,
+    };
   }
 
   async findOne(id: number): Promise<ClassDto> {

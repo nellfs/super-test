@@ -17,6 +17,9 @@ import {
 } from '../constants/messages.constants';
 import { ClassModel } from '../classes/class.model';
 import { ClassDto } from 'src/classes/dto/class.dto';
+import { Pagination, PaginationResponse } from 'src/utils/pagination.dto';
+import { StudentFilter } from './dto/filter.dto';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class StudentsService {
@@ -40,8 +43,33 @@ export class StudentsService {
     return created_student as StudentDto;
   }
 
-  async findAll(): Promise<StudentDto[]> {
-    return (await this.studentModel.findAll()) as StudentDto[];
+  async findAll(
+    pagination_options: Pagination,
+    filter: StudentFilter,
+  ): Promise<PaginationResponse<StudentDto>> {
+    const { page = 1, limit = 2 } = pagination_options;
+    const offset = (page - 1) * limit;
+
+    const where_filter: any = {};
+
+    if (filter.name) {
+      where_filter.first_name = {
+        [Op.startsWith]: `${filter.name}`,
+      };
+    }
+
+    const { count, rows } = await this.studentModel.findAndCountAll({
+      limit: +limit,
+      offset,
+      where: where_filter,
+    });
+
+    return {
+      items: rows as StudentDto[],
+      limit,
+      total: count,
+      page: page,
+    };
   }
 
   async findOne(id: number): Promise<StudentDto> {

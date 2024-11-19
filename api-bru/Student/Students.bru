@@ -5,7 +5,13 @@ meta {
 }
 
 get {
-  url: {{api}}/students
+  url: {{api}}/students?limit=5&page=1&name=Testasdfsaf
   body: none
   auth: none
+}
+
+params:query {
+  limit: 5
+  page: 1
+  name: Testasdfsaf
 }

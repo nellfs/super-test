@@ -9,6 +9,7 @@ import {
   SUCCESS_MESSAGES,
 } from 'src/constants/messages.constants';
 import { ClassModel } from 'src/classes/class.model';
+import { Op } from 'sequelize';
 
 describe('StudentsService', () => {
   let service: StudentsService;
@@ -61,6 +62,7 @@ describe('StudentsService', () => {
   };
 
   const mock_student_service = {
+    findAndCountAll: jest.fn().mockResolvedValue(mock_student_list),
     findOne: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
@@ -98,6 +100,86 @@ describe('StudentsService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined();
     expect(student_model).toBeDefined();
+  });
+  describe('findAll', () => {
+    it('should return paginated results without filters', async () => {
+      const mockResponse = {
+        count: mock_student_list.length,
+        rows: mock_student_list.slice(0, 2),
+      };
+      jest
+        .spyOn(student_model, 'findAndCountAll')
+        .mockResolvedValueOnce(mockResponse as any);
+
+      const result = await service.findAll({ page: 1, limit: 2 }, {});
+
+      expect(result).toEqual({
+        items: mock_student_list.slice(0, 2),
+        limit: 2,
+        total: mock_student_list.length,
+        page: 1,
+      });
+      expect(student_model.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 0,
+        where: {},
+      });
+    });
+
+    it('should apply name filter', async () => {
+      const mockResponse = {
+        count: 1,
+        rows: [mock_student_list[0]],
+      };
+      jest
+        .spyOn(student_model, 'findAndCountAll')
+        .mockResolvedValueOnce(mockResponse as any);
+
+      const result = await service.findAll(
+        { page: 1, limit: 2 },
+        { name: 'Heron' },
+      );
+
+      expect(result).toEqual({
+        items: [mock_student_list[0]],
+        limit: 2,
+        total: 1,
+        page: 1,
+      });
+      expect(student_model.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 0,
+        where: {
+          first_name: {
+            [Op.startsWith]: 'Heron',
+          },
+        },
+      });
+    });
+
+    it('should handle pagination offset correctly', async () => {
+      const mockResponse = {
+        count: mock_student_list.length,
+        rows: mock_student_list.slice(2, 3),
+      };
+      jest
+        .spyOn(student_model, 'findAndCountAll')
+        .mockResolvedValueOnce(mockResponse as any);
+
+      const result = await service.findAll({ page: 2, limit: 2 }, {});
+
+      expect(result).toEqual({
+        items: mock_student_list.slice(2, 3),
+        limit: 2,
+        total: mock_student_list.length,
+        page: 2,
+      });
+      expect(student_model.findAndCountAll).toHaveBeenCalledWith({
+        limit: 2,
+        offset: 2,
+        where: {},
+      });
+    });
   });
 
   describe('findOne', () => {

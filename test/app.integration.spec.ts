@@ -12,7 +12,7 @@ import {
   TEST_STUDENTS,
 } from '../src/utils/setup_database';
 import { SUCCESS_MESSAGES } from '../src/constants/messages.constants';
-import { UpdateClassDTO } from 'src/classes/dto/class.dto';
+import { ClassDto, UpdateClassDTO } from 'src/classes/dto/class.dto';
 import { EnrollStudentsDto } from 'src/student_class/dto/student-class.dto';
 import { UpdateStudentDto } from 'src/students/dto/student.dto';
 
@@ -81,15 +81,17 @@ describe('AppController (All Routes)', () => {
   });
 
   describe('Classes Test', () => {
-    describe('GET /classes', () => {
-      it('should return all classes', async () => {
+    describe('GET /classes (with limit)', () => {
+      it('should return a page of classes', async () => {
         const response = await request(app.getHttpServer())
-          .get('/classes')
+          .get('/classes?limit=100&page=1')
           .expect(200);
 
-        expect(response.body).toHaveLength(TEST_CLASSES.length);
+        console.log(response.body);
 
-        response.body.forEach((classItem: any) => {
+        expect(response.body.items).toHaveLength(TEST_CLASSES.length);
+
+        response.body.items.forEach((classItem: ClassDto) => {
           expect(classItem).toEqual({
             id: expect.any(Number),
             name: expect.any(String),
@@ -103,8 +105,10 @@ describe('AppController (All Routes)', () => {
         });
 
         TEST_CLASSES.forEach((_, index) => {
-          expect(response.body[index].name).toBe(TEST_CLASSES[index].name);
-          expect(response.body[index].description).toBe(
+          expect(response.body.items[index].name).toBe(
+            TEST_CLASSES[index].name,
+          );
+          expect(response.body.items[index].description).toBe(
             TEST_CLASSES[index].description,
           );
         });
@@ -204,15 +208,15 @@ describe('AppController (All Routes)', () => {
   });
 
   describe('Students Test', () => {
-    describe('GET /students', () => {
-      it('should all students', async () => {
+    describe('GET /students (with limits)', () => {
+      it('should return a page of students', async () => {
         const response = await request(app.getHttpServer())
-          .get('/students')
+          .get('/students?limit=100')
           .expect(200);
 
-        expect(response.body).toHaveLength(TEST_CLASSES.length);
+        expect(response.body.items).toHaveLength(TEST_CLASSES.length);
 
-        response.body.forEach((classItem: any) => {
+        response.body.items.forEach((classItem: ClassDto) => {
           expect(classItem).toEqual({
             id: expect.any(Number),
             first_name: expect.any(String),
@@ -226,13 +230,13 @@ describe('AppController (All Routes)', () => {
         });
 
         TEST_STUDENTS.forEach((_, index) => {
-          expect(response.body[index].first_name).toBe(
+          expect(response.body.items[index].first_name).toBe(
             TEST_STUDENTS[index].first_name,
           );
-          expect(response.body[index].last_name).toBe(
+          expect(response.body.items[index].last_name).toBe(
             TEST_STUDENTS[index].last_name,
           );
-          expect(response.body[index].email).toBe(TEST_STUDENTS[index].email);
+          expect(response.body.items[index].email).toBe(TEST_STUDENTS[index].email);
         });
       });
     });
